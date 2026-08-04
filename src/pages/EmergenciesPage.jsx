@@ -3,9 +3,9 @@ import RightSideBar from '../components/RightSideBar';
 const EmergenciesPage = () => {
   return (
     <div className="flex">
-      <main className="flex-1 pt-24 pr-80 pb-12 pl-margin-desktop min-h-screen">
+      <main className="flex-1 pt-24 pr-[calc(20rem+2rem)] pb-12 pl-margin-desktop min-h-screen">
         <div className="max-w-container-max-width mx-auto">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-8">
             <h1 className="font-display-lg text-3xl font-black text-on-surface">Live Emergency Manifest</h1>
             <div className="flex gap-2">
               <span className="px-3 py-1 bg-error-container/20 text-error rounded-full text-[11px] font-bold uppercase tracking-wider">3 Critical Alerts</span>

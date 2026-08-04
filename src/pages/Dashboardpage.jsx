@@ -3,8 +3,8 @@ import RightSideBar from '../components/RightSideBar';
 const DashboardPage = () => {
   return (
     <div className="flex">
-      <main className="flex-1 pt-24 pr-80 pb-12 pl-margin-desktop min-h-screen">
-        <div className="max-w-container-max-width mx-auto space-y-6">
+      <main className="flex-1 pt-24 pr-[calc(20rem+2rem)] pb-12 pl-margin-desktop min-h-screen">
+        <div className="max-w-container-max-width mx-auto space-y-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
               <h1 className="font-display-lg text-4xl text-primary leading-tight font-black">Emergency Rescue Monitoring</h1>
@@ -25,7 +25,7 @@ const DashboardPage = () => {
               { label: 'Response', value: '18m', icon: 'timer', color: 'text-on-surface' },
               { label: 'Signal', value: '98%', icon: 'signal_cellular_alt', color: 'text-primary-fixed-dim' }
             ].map((stat, i) => (
-              <div key={i} className="glass-panel p-4 rounded-xl border-l-4 border-primary-fixed-dim/20">
+              <div key={i} className="glass-panel p-5 rounded-xl border-l-4 border-primary-fixed-dim/20">
                 <p className="font-label-mono text-[10px] text-on-surface-variant uppercase">{stat.label}</p>
                 <div className="flex items-end justify-between mt-1">
                   <span className={`font-black text-2xl ${stat.color}`}>{stat.value}</span>
@@ -51,7 +51,7 @@ const DashboardPage = () => {
                 <div className="w-4 h-4 bg-primary-fixed-dim rounded-full relative shadow-[0_0_15px_rgba(0,219,231,0.5)]"></div>
                 <div className="mt-1 glass-panel px-2 py-1 rounded text-[10px] font-label-mono text-primary-fixed-dim">ARD-012 (Active)</div>
               </div>
-              <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+              <div className="absolute bottom-4 right-4 flex flex-col gap-2 p-2 glass-panel rounded-2xl">
                 <button className="w-10 h-10 glass-panel flex items-center justify-center rounded hover:bg-surface-variant transition-colors">
                   <span className="material-symbols-outlined">add</span>
                 </button>

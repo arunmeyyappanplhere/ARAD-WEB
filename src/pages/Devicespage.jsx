@@ -3,7 +3,7 @@ import RightSideBar from '../components/RightSideBar';
 const DevicesPage = () => {
   return (
     <div className="flex">
-      <main className="flex-1 pt-24 pr-80 pb-12 pl-margin-desktop min-h-screen">
+      <main className="flex-1 pt-24 pr-[calc(20rem+2rem)] pb-12 pl-margin-desktop min-h-screen">
         <div className="max-w-container-max-width mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
@@ -23,7 +23,7 @@ const DevicesPage = () => {
               { l: 'Avg Battery', v: '84', s: '%', c: 'text-on-surface' },
               { l: 'Gateway', v: 'SAT-01', s: '', c: 'text-secondary' }
             ].map((s, i) => (
-              <div key={i} className="glass-panel p-4 rounded-xl">
+              <div key={i} className="glass-panel p-5 rounded-xl">
                 <p className="font-label-mono text-[10px] text-on-surface-variant uppercase">{s.l}</p>
                 <p className={`text-3xl font-black ${s.c}`}>{s.v}<span className="text-xs ml-1 font-normal text-on-surface-variant">{s.s}</span></p>
               </div>
