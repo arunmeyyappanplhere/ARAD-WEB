@@ -15,7 +15,6 @@ const RightSideBar = ({ showStats = false }) => {
               <span className="font-label-mono text-[10px] text-primary-fixed-dim">ARD-001</span>
               <span className="font-label-mono text-[10px] text-on-surface-variant">14:22:01</span>
             </div>
-            <p className="text-[11px] leading-tight">Location updated via LoRa Gate-04. Signal RSSI: -92dBm.</p>
           </div>
           <div className="p-3 rounded bg-error-container/10 border-l-2 border-error hover:bg-error-container/20 transition-all">
             <div className="flex justify-between items-start mb-1">
@@ -29,7 +28,7 @@ const RightSideBar = ({ showStats = false }) => {
               <span className="font-label-mono text-[10px] text-on-surface-variant">SYS-CORE</span>
               <span className="font-label-mono text-[10px] text-on-surface-variant">14:21:10</span>
             </div>
-            <p className="text-[11px] leading-tight">Health: 98%. All LoRa meshes synchronized.</p>
+            {/* <p className="text-[11px] leading-tight">Health: 98%. All LoRa meshes synchronized.</p> */}
           </div>
           <div className="p-3 rounded bg-surface-variant/20 border-l-2 border-primary-fixed-dim/40">
             <div className="flex justify-between items-start mb-1">
