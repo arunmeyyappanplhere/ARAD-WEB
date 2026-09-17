@@ -11,7 +11,7 @@ const TeamsPage = () => {
 
   return (
     <div className="flex">
-      <main className="flex-1 pt-24 pr-[calc(20rem+2rem)] pb-12 pl-margin-desktop min-h-screen">
+      <main className="flex-1 pt-24 pr-6 lg:pr-[calc(20rem+2rem)] pb-12 pl-6 lg:pl-margin-desktop min-h-screen">
         <div className="max-w-container-max-width mx-auto mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <nav className="flex items-center gap-2 text-on-surface-variant mb-2">

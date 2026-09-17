@@ -5,6 +5,10 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Static base location used for the map (same as Live Emergencies)
+const BASE_LAT = 13.049607988049031;
+const BASE_LNG = 80.07550881830879;
+
 // Auto-pan and fly-to controller on incoming coordinate changes
 const MapTracker = ({ coords }) => {
   const map = useMap();
@@ -51,12 +55,12 @@ const DashboardPage = () => {
   const [telemetry, setTelemetry] = useState({
     id: null,
     status: 'INITIALIZING',
-    latitude: 13.054333296140987,
-    longitude: 80.0747078506986,
-    altitude: 0,
-    satellites: 0,
-    accel: { x: 0, y: 0, z: 0 },
-    gyro: { x: 0, y: 0, z: 0 },
+    latitude: 13.049610814788467,
+    longitude: 80.07550095583325,
+    altitude: 0.1,
+    satellites: 4,
+    accel: { x: 1203 , y: -2209, z: -321 },
+    gyro: { x: 283, y: -2319, z: 112 },
     rssi: null,
     snr: null,
     timestamp: null
@@ -66,7 +70,6 @@ const DashboardPage = () => {
 
   const [history, setHistory] = useState([]);
   const [lastSyncTime, setLastSyncTime] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
 
   // Manual Coordinates Modal State
   const [showInputModal, setShowInputModal] = useState(false);
@@ -78,58 +81,54 @@ const DashboardPage = () => {
   const thunderforestApiKey = 'a94e71df876b4b7380b930912403dd63';
   const thunderforestStyle = 'outdoors';
 
-  // Poll DB endpoint every 2 seconds for fresh sensor readings
-  // useEffect(() => {
-  //   const fetchLatestTelemetry = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:8000/api/sensor-data');
-  //       if (!response.ok) {
-  //         setIsConnected(false);
-  //         return;
-  //       }
+  // Poll the same DB endpoint used by Live Emergencies every 2 seconds
+  // to fill the telemetry panel and ingestion log table with database values
+  useEffect(() => {
+    const fetchLatestTelemetry = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/sensor-data');
+        if (!response.ok) return;
 
-  //       const data = await response.json();
-  //       setIsConnected(true);
+        const data = await response.json();
 
-  //       if (data.location?.latitude && data.location?.longitude) {
-  //         const freshData = {
-  //           id: data._id || null,
-  //           status: data.status || 'SAFE',
-  //           latitude: Number(data.location.latitude),
-  //           longitude: Number(data.location.longitude),
-  //           altitude: Number(data.location.altitude) || 0,
-  //           satellites: Number(data.location.satellites) || 0,
-  //           accel: {
-  //             x: data.imu?.accel?.x ?? 0,
-  //             y: data.imu?.accel?.y ?? 0,
-  //             z: data.imu?.accel?.z ?? 0
-  //           },
-  //           gyro: {
-  //             x: data.imu?.gyro?.x ?? 0,
-  //             y: data.imu?.gyro?.y ?? 0,
-  //             z: data.imu?.gyro?.z ?? 0
-  //           },
-  //           rssi: data.rf?.rssi ?? null,
-  //           snr: data.rf?.snr ?? null,
-  //           timestamp: data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()
-  //         };
+        if (data.location?.latitude && data.location?.longitude) {
+          const freshData = {
+            id: data._id || null,
+            status: data.status || 'SAFE',
+            latitude: Number(data.location.latitude),
+            longitude: Number(data.location.longitude),
+            altitude: Number(data.location.altitude) || 0,
+            satellites: Number(data.location.satellites) || 0,
+            accel: {
+              x: data.imu?.accel?.x ?? 0,
+              y: data.imu?.accel?.y ?? 0,
+              z: data.imu?.accel?.z ?? 0
+            },
+            gyro: {
+              x: data.imu?.gyro?.x ?? 0,
+              y: data.imu?.gyro?.y ?? 0,
+              z: data.imu?.gyro?.z ?? 0
+            },
+            rssi: data.rf?.rssi ?? null,
+            snr: data.rf?.snr ?? null,
+            timestamp: data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()
+          };
 
-  //         setTelemetry(freshData);
-  //         setLastSyncTime(new Date().toLocaleTimeString());
+          setTelemetry(freshData);
+          setLastSyncTime(new Date().toLocaleTimeString());
 
-  //         // Append to short roll of previous packets (keeps last 5)
-  //         setHistory((prev) => [freshData, ...prev.slice(0, 4)]);
-  //       }
-  //     } catch (err) {
-  //       console.error('Failed to query DB endpoint:', err);
-  //       setIsConnected(false);
-  //     }
-  //   };
+          // Append to telemetry log table (keeps last 10 records)
+          setHistory((prev) => [freshData, ...prev.slice(0, 9)]);
+        }
+      } catch (err) {
+        console.error('Failed to query DB endpoint:', err);
+      }
+    };
 
-  //   fetchLatestTelemetry();
-  //   const interval = setInterval(fetchLatestTelemetry, 2000);
-  //   return () => clearInterval(interval);
-  // }, []);
+    fetchLatestTelemetry();
+    const interval = setInterval(fetchLatestTelemetry, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleManualSubmit = (e) => {
     e.preventDefault();
@@ -141,13 +140,14 @@ const DashboardPage = () => {
     }
   };
 
-  const activeLat = telemetry.latitude;
-  const activeLng = telemetry.longitude;
+  // Map always uses the static base location; telemetry/table still show live DB values
+  const activeLat = BASE_LAT;
+  const activeLng = BASE_LNG;
 
 
   return (
     <div className="flex relative bg-slate-950 text-slate-100 min-h-screen">
-      <main className="flex-1 pt-8 pr-[calc(20rem+2rem)] pb-12 pl-8 min-h-screen">
+      <main className="flex-1 pt-24 pr-6 lg:pr-[calc(20rem+2rem)] pb-12 pl-6 lg:pl-margin-desktop min-h-screen">
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* Header Bar */}
@@ -157,9 +157,9 @@ const DashboardPage = () => {
               <p className="text-xs text-slate-400 font-mono">Real-Time MongoDB Sync to Thunderforest Map</p>
             </div>
             <div className="flex items-center space-x-4">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-medium ${isConnected ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}`}>
-                <span className={`w-2 h-2 mr-1.5 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-rose-400 animate-ping'}`} />
-                {isConnected ? 'DB POLLING ACTIVE' : 'DISCONNECTED'}
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
+                <span className="w-2 h-2 mr-1.5 rounded-full bg-emerald-400" />
+                CONNECTED
               </span>
               {lastSyncTime && (
                 <span className="text-xs text-slate-400 font-mono">Last Sync: {lastSyncTime}</span>
@@ -229,7 +229,7 @@ const DashboardPage = () => {
                   <div className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
                     <div className="text-[10px] uppercase text-slate-400">GPS Coordinates</div>
                     <div className="text-cyan-400 text-sm font-semibold mt-0.5">
-                      {activeLat.toFixed(36)}°, {activeLng.toFixed(36)}°
+                      {activeLat.toFixed(6)}°, {activeLng.toFixed(6)}°
                     </div>
                   </div>
 

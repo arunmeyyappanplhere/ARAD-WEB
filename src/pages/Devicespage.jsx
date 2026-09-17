@@ -3,7 +3,7 @@ import RightSideBar from '../components/RightSideBar';
 const DevicesPage = () => {
   return (
     <div className="flex">
-      <main className="flex-1 pt-24 pr-[calc(20rem+2rem)] pb-12 pl-margin-desktop min-h-screen">
+      <main className="flex-1 pt-24 pr-6 lg:pr-[calc(20rem+2rem)] pb-12 pl-6 lg:pl-margin-desktop min-h-screen">
         <div className="max-w-container-max-width mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>

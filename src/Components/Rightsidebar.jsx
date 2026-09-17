@@ -1,6 +1,6 @@
 const RightSideBar = ({ showStats = false }) => {
   return (
-    <aside className="fixed right-0 top-16 h-[calc(100vh-64px)] z-40 flex flex-col bg-surface-container-low/40 backdrop-blur-lg border-l border-outline-variant w-80 overflow-hidden">
+    <aside className="fixed right-0 top-16 h-[calc(100vh-64px)] z-40 hidden lg:flex lg:flex-col bg-surface-container-low/40 backdrop-blur-lg border-l border-outline-variant w-80 overflow-hidden">
       <div className="p-6 border-b border-outline-variant">
         <div className="flex items-center gap-3 mb-1">
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>sensors</span>

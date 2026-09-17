@@ -1,30 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
 import RightSideBar from '../components/RightSideBar';
 
-const BASE_LAT = 13.054333296140987;
-const BASE_LNG = 80.0747078506986;
+const BASE_LAT = 13.049607988049031;
+const BASE_LNG = 80.07550881830879;
+
+// One alert turns red (critical) every minute; the rest stay blue
+const CRITICAL_ALERT_INTERVAL_MS = 60000;
+
+// Slightly randomize coordinates around the proper location (~±200m) for non-critical alerts
+const jitterCoords = (lat, lng) => {
+  const offset = () => (Math.random() - 0.5) * 0.004;
+  return {
+    lat: (Number(lat) + offset()).toFixed(6),
+    lng: (Number(lng) + offset()).toFixed(6)
+  };
+};
 
 const EmergenciesPage = () => {
   const [emergencies, setEmergencies] = useState([]);
   const prevCoordsRef = useRef({ lat: null, lng: null });
+  const lastCriticalRef = useRef(0);
 
   const getActiveCoordinates = async () => {
-    // 1. Try fetching live backend data
+    // 1. Try fetching live backend data (proper/actual location)
     try {
       const response = await fetch('http://localhost:8000/api/sensor-data');
       if (response.ok) {
         const data = await response.json();
         if (data.location?.latitude && data.location?.longitude) {
-          const isEmergency = data.status === 'EMERGENCY';
           return {
             id: 'ARAD-SNOW-RESCUE',
             lat: Number(data.location.latitude).toFixed(6),
-            lng: Number(data.location.longitude).toFixed(6),
-            status: isEmergency ? 'SOS Triggered' : 'Active Broadcast',
-            p: isEmergency ? 'P1 CRITICAL' : 'P2 HIGH',
-            team: isEmergency ? 'SkyRescue-4' : 'Ground Alpha',
-            color: isEmergency ? 'text-error' : 'text-primary-fixed-dim',
-            bg: isEmergency ? 'bg-error' : 'bg-primary-fixed-dim'
+            lng: Number(data.location.longitude).toFixed(6)
           };
         }
       }
@@ -41,12 +48,7 @@ const EmergenciesPage = () => {
           return {
             id: 'ARAD-NODE-01',
             lat: Number(parsed.lat).toFixed(6),
-            lng: Number(parsed.lng).toFixed(6),
-            status: 'SOS Triggered',
-            p: 'P1 CRITICAL',
-            team: 'SkyRescue-4',
-            color: 'text-error',
-            bg: 'bg-error'
+            lng: Number(parsed.lng).toFixed(6)
           };
         }
       }
@@ -58,12 +60,7 @@ const EmergenciesPage = () => {
     return {
       id: 'ARAD-NODE-01',
       lat: BASE_LAT.toFixed(6),
-      lng: BASE_LNG.toFixed(6),
-      status: 'SOS Triggered',
-      p: 'P1 CRITICAL',
-      team: 'SkyRescue-4',
-      color: 'text-error',
-      bg: 'bg-error'
+      lng: BASE_LNG.toFixed(6)
     };
   };
 
@@ -71,16 +68,28 @@ const EmergenciesPage = () => {
     const active = await getActiveCoordinates();
     const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
+    // Once every minute the new alert is RED (critical) with the proper location,
+    // all other alerts are BLUE with slightly randomized coordinates.
+    const now = Date.now();
+    const isCritical = now - lastCriticalRef.current >= CRITICAL_ALERT_INTERVAL_MS;
+    if (isCritical) {
+      lastCriticalRef.current = now;
+    }
+
+    const coords = isCritical
+      ? { lat: active.lat, lng: active.lng }
+      : jitterCoords(active.lat, active.lng);
+
     const newRecord = {
       id: active.id,
-      lat: active.lat,
-      lng: active.lng,
+      lat: coords.lat,
+      lng: coords.lng,
       time: currentTime,
-      status: active.status,
-      p: active.p,
-      team: active.team,
-      color: active.color,
-      bg: active.bg,
+      status: isCritical ? 'SOS Triggered' : 'Active Broadcast',
+      p: isCritical ? 'P1 CRITICAL' : 'P2 HIGH',
+      team: isCritical ? 'SkyRescue-4' : 'Ground Alpha',
+      color: isCritical ? 'text-error' : 'text-primary-fixed-dim',
+      bg: isCritical ? 'bg-error' : 'bg-primary-fixed-dim',
       uid: `${active.id}-${currentTime}-${Math.random().toString(36).substr(2, 4)}`
     };
 
@@ -102,14 +111,15 @@ const EmergenciesPage = () => {
 
   const criticalCount = emergencies.filter(e => e.p === 'P1 CRITICAL').length;
 
-  const handleTrackLocation = (lat, lng) => {
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  const handleTrackLocation = () => {
+    // Always route to the static base location, regardless of the (jittered) row coordinates shown
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${BASE_LAT},${BASE_LNG}`;
     window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div className="flex">
-      <main className="flex-1 pt-24 pr-[calc(20rem+2rem)] pb-12 pl-margin-desktop min-h-screen">
+      <main className="flex-1 pt-24 pr-6 lg:pr-[calc(20rem+2rem)] pb-12 pl-6 lg:pl-margin-desktop min-h-screen">
         <div className="max-w-container-max-width mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
@@ -151,7 +161,7 @@ const EmergenciesPage = () => {
                       <td className="px-6 py-4 text-xs">{row.team}</td>
                       <td className="px-6 py-4">
                         <button 
-                          onClick={() => handleTrackLocation(row.lat, row.lng)}
+                          onClick={() => handleTrackLocation()}
                           className="flex items-center gap-1 bg-primary-fixed-dim/20 text-primary-fixed-dim hover:bg-primary-fixed-dim/40 px-3 py-1 rounded transition-colors"
                         >
                           <span className="material-symbols-outlined text-[14px]">map</span>

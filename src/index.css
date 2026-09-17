@@ -109,6 +109,10 @@
 
 /* ===== Tailwind v4 theme mapping ===== */
 @theme {
+  /* Layout spacing tokens (used by px-margin-desktop, pl-margin-desktop, max-w-container-max-width) */
+  --spacing-margin-desktop: 2rem;
+  --container-container-max-width: 90rem;
+
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-dim: var(--surface-dim);

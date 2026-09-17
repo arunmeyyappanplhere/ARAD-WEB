@@ -88,7 +88,7 @@ const AnalyticsPage = () => {
   }, [theme]);
 
   return (
-    <main className="pt-24 px-margin-desktop pb-12 max-w-container-max-width mx-auto">
+    <main className="pt-24 px-6 lg:px-margin-desktop pb-12 max-w-container-max-width mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
         <div>
           <h1 className="font-headline-md text-2xl text-primary-fixed-dim font-black mb-1">Fleet Analytics</h1>
